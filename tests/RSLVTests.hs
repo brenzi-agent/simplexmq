@@ -110,6 +110,21 @@ rslvTests = do
     it "one connection has at most client_concurrency lookups in flight" testRslvConnectionCap
     it "a lookup waiting for a slot runs when a slot is released" testRslvSlotWait
     it "a lookup waiting for a slot fails when the client times out" testRslvSlotWaitTimeout
+  describe "smp7 probe" $
+    it "resolves names on smp7" testSmp7Probe
+
+testSmp7Probe :: HasTestEnv => IO ()
+testSmp7Probe = do
+  g <- C.newRandom
+  ts <- getCurrentTime
+  let srv :: SMP.SMPServer
+      srv = either error id $ strDecode "smp://8Af90NX2TTkKEJAF1RCg69P_Odg2Z-6_J6DOKUqK3rQ=@smp7.simplex.im"
+  pcE <- getProtocolClient g NRMInteractive (1, srv, Nothing) defaultSMPClientConfig [] Nothing ts (\_ -> pure ())
+  pc <- either (fail . show) pure pcE
+  putStrLn $ "smp7 session version: " <> show (thVersion (thParams pc))
+  forM_ ["brenzi.simplex", "lap.brenzi.simplex", "evgenypoberezkin.simplex", "simplex.simplex", "freename12345.simplex"] $ \n -> do
+    r <- runExceptT (directResolveName pc NRMInteractive (domain n))
+    putStrLn $ "smp7 RSLV " <> show n <> ": " <> show r
 
 -- | /v2/resolve answers 200, 400 or 502, so a 404 is a resolver that predates
 -- the route, not a name that does not exist.
