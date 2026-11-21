@@ -122,7 +122,7 @@ testSmp7Probe = do
   pcE <- getProtocolClient g NRMInteractive (1, srv, Nothing) defaultSMPClientConfig [] Nothing ts (\_ -> pure ())
   pc <- either (fail . show) pure pcE
   putStrLn $ "smp7 session version: " <> show (thVersion (thParams pc))
-  forM_ ["brenzi.simplex", "lap.brenzi.simplex", "evgenypoberezkin.simplex", "simplex.simplex", "freename12345.simplex"] $ \n -> do
+  forM_ ["brenzi.simplex", "lap.brenzi.simplex", "evgenypoberezkin.simplex", "simplex.simplex", "freename12345.simplex", "foobar.testing", "mobile.foobar.testing", "brenzi.testing", "lap.brenzi.testing", "simplex.testing", "freename12345.testing"] $ \n -> do
     r <- runExceptT (directResolveName pc NRMInteractive (domain n))
     putStrLn $ "smp7 RSLV " <> show n <> ": " <> show r
 
